@@ -40,10 +40,12 @@ namespace DetectFaceTester
                 if (!File.Exists(sourcFilePath))
                     throw new Exception("작업할 이미지 소스가 없습니다.");
 
+                //이미지 로드 및 Blur 처리할 영역 찾기
                 using Mat image = Cv2.ImRead(sourcFilePath, ImreadModes.Color);
                 pictureBox1.Image = Image.FromFile(sourcFilePath);
                 _faceRect = eyeCascade.DetectMultiScale(image);
 
+                //찾은 눈코입 Blur 처리
                 var blurredImage = ApplyBlurToRegion(image, _faceRect,15);
 
                 var dirPath      = Path.GetDirectoryName(sourcFilePath);
@@ -52,6 +54,7 @@ namespace DetectFaceTester
                 var destFilePath = @$"{dirPath}\\{fileName}_blured{ext}";
                 Cv2.ImWrite(@$"{dirPath}\\{fileName}_blured{ext}", blurredImage);
 
+                //Blur 처리된 이미지 윈도우에서 제공하는 기본 이미지 뷰어 실행하여 보이도록 함
                 ProcessStartInfo startInfo = new ProcessStartInfo();
                 startInfo.FileName = destFilePath;
                 startInfo.UseShellExecute = true;
@@ -81,14 +84,7 @@ namespace DetectFaceTester
 
             return result;
         }
-
-        private Bitmap MatToBitmap(Mat mat)
-        {
-            using (var ms = mat.ToMemoryStream())
-            {
-                return (Bitmap)Image.FromStream(ms);
-            }
-        }
+        
 
         private void btnSet_Click(object sender, EventArgs e)
         {
